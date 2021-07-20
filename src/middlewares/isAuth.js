@@ -4,7 +4,7 @@ const secret = process.env.SECRET;
 const isAuth = (request, response, next) => {
     const token = request.cookies.authcookie;
     if (!token) {
-        next() 
+        response.status(403).json({message: "Access denied"}) 
     }
     else {
         jwt.verify(token, secret, (error, user) => {
@@ -12,11 +12,11 @@ const isAuth = (request, response, next) => {
                 response.send(error.message);
             }
             else {
-                const {username, firstname, lastname, email, id_customer, exp} = user;
+                const {firstname, lastname, email, id_customer, exp} = user;
                 if (Date.now()/1000 >= exp) {
                     next()
                 }
-                request.user = {username, firstname, lastname, email, id_customer};
+                request.user = {firstname, lastname, email, id_customer};
                 next();
             }
         })

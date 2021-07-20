@@ -1,5 +1,4 @@
 const { json } = require("express");
-require('dotenv').config();
 const cors = require("cors");
 const express = require("express");
 const app = express();
@@ -7,6 +6,7 @@ require ('dotenv').config();
 const morgan = require('morgan');
 const router = require("./routes");
 const session = require('express-session');
+
 
 app.use(cors());
 app.use(session({

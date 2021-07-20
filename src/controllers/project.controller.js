@@ -1,20 +1,38 @@
+const { result } = require("lodash");
 const project = require("../models/project.model") 
+const { projectValidation } = require('../validators')
 
 exports.createOne = (request, response) => {
-    let {creation_date, body_area, size, body_picture, tattoo_owner, tattoo_picture, description_txt, description_img, description_nikos_ttt, activity, city, country, drawing_session, tattoo_session, customer_id} = request.body;
-    const {username} = request.username;
-    if (!username) {
-        response.status(401).json({message: "User not connected"})
-    }
-    // else if (role === "guest") {
-    //     response.status(403).json({message: "Access denied"})
-    // }
-        else {
-            if (!body_area || !size || !body_picture || !tattoo_owner || !description_txt ||!description_nikos_ttt || !activity || !city || !country || !drawing_session || !tattoo_session || !customer_id ) {
-                response.status(400).json({message: "Missing input"})
-            }
+    const errors = projectValidation(request.body)
+        if (errors.length > 0 ) {
+            response.status(400).json({errors})
         }
-}
+        else {
+            const project = {...request.body, customer_id : request.user.customer_id, creation_date: Date.now()}
+            project.addOne (project, (error, result) => {
+                if (error) {
+                    response.send (error.message);
+                }
+                else {
+                    if (tattoo_picture) {
+                        project.addTattooPicture(request.body, result[0].id_project, (error, result) => {
+                            if (error) {
+                                response.send (error.message);
+                            }
+                        })
+                    }
+                    if (description_img) {
+                        project.addDescriptionImg(request.body, result[0].id_project, (error, result) => {
+                            if (error) {
+                                response.send (error.message);
+                            }
+                        })
+                    }
+                    response.status(201).json({message: "Project completed successfully!"})
+                }  
+            })
+        }
+    }
 
 exports.getProjects = (request,response) => {
     user.getAllProjects ((error, projects) =>{
@@ -27,7 +45,6 @@ exports.getProjects = (request,response) => {
     })
 }
 
-
 exports.projectDetails = (request, response) => {
     const {id_project} = request.params
     project.getDetails (id_project, (error, project_info) => {
@@ -38,7 +55,6 @@ exports.projectDetails = (request, response) => {
             response.status(200).json({"project": project_info});
         }
     })
-
 }
 
 exports.updateProject = (request, response) => {
@@ -46,7 +62,7 @@ exports.updateProject = (request, response) => {
     const {id_customer} = request.body;
     project.getDetails (id_project, (error, project_info) => {
     if (id_customer !== projet_info.customer_id) {
-        response.status(403).json({message: "Vous n'êtes pas autorisé à accéder à cette ressource"})
+        response.status(403).json({message: "You are not authorized to access this resource"})
     }
     else {
         project.modifyProjectInfos(id_project, request.body, (error, result) => {
@@ -60,8 +76,6 @@ exports.updateProject = (request, response) => {
         }
     })
 }
-
-
 
 exports.deleteProject = (request, response) => {
     const {id_project} = request.params;

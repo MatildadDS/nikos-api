@@ -1,8 +1,29 @@
 const database = require('../config/db');
 
 exports.addOne = (project, callback) => {
-    database.query(`INSERT INTO project (id_project, creation_date, body_area, size, body_picture, tattoo_owner,tattoo_picture, description_txt, description_img, description_nikos_ttt, activity, city, country, drawing_session, tattoo_session, customer_id) VALUES (${project.id_project}, ${project.creation_date}, "${project.body_area}", "${project.size}", "${project.body_picture}", ${project.tattoo_owner}, ${project.tattoo_picture}, ${project.description_txt}, ${project.description_img}, ${project.description_nikos_ttt}, ${project.activity}, ${project.city}, ${project.country}, ${project.drawing_session}, ${project.tattoo_session}, ${project.customer_id});`, (error, result) => {
+    database.query(`INSERT INTO project (id_project, creation_date, body_area, size, body_picture, tattoo_owner, description_txt, description_img, description_nikos_ttt, activity, city, country, drawing_session, tattoo_session, customer_id) VALUES (${project.id_project}, ${project.creation_date}, "${project.body_area}", "${project.size}", "${project.body_picture}", ${project.tattoo_owner}, ${project.description_txt}, ${project.description_img}, ${project.description_nikos_ttt}, ${project.activity}, ${project.city}, ${project.country}, ${project.drawing_session}, ${project.tattoo_session}, ${project.customer_id});`, (error, result) => {
+        if (error) {
+            console.log("error :", error);
+            callback(error, null);
+            return;
+        } 
+        callback(null, result);
+    })
+}
 
+exports.addTattooPicture = (project, id, callback) => {
+    database.query(`UPDATE project SET tattoo_picture="${project.tattoo_picture}" WHERE id_project=${id};`, (error, result) => {
+        if (error) {
+            console.log("error :", error);
+            callback(error, null);
+            return;
+        } 
+        callback(null, result);
+    })
+}
+
+exports.addDescriptionImg = (project, id, callback) => {
+    database.query(`UPDATE project SET description_img="${project.description_img}" WHERE id_project=${id};`, (error, result) => {
         if (error) {
             console.log("error :", error);
             callback(error, null);

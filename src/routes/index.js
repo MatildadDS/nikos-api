@@ -8,7 +8,7 @@ const isAuth = require("../middlewares/isAuth");
 //GET
 router.get("/", controller.home);
 router.get('/', projectController.getProjects);
-router.get("/project/:id_project", projectController.projectDetails);
+router.get("/project/:id_project", isAuth, projectController.projectDetails);
 
 //POST
 router.post("/signin", controller.login);
