@@ -1,4 +1,4 @@
-const projectValidation = require("./project");
+const projectValidation = require("./projectValidators");
 
 module.exports = {
   projectValidation,

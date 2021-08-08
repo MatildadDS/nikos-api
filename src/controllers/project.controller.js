@@ -59,7 +59,7 @@ exports.projectDetails = (request, response) => {
 
 exports.updateProject = (request, response) => {
     const {id_project} = request.params;
-    const {id_customer} = request.body;
+    const {id_customer} = request.body
     project.getDetails (id_project, (error, project_info) => {
     if (id_customer !== projet_info.customer_id) {
         response.status(403).json({message: "You are not authorized to access this resource"})

@@ -1,7 +1,6 @@
-const database = require("../config/db");
+const db = require("../config/db");
 
-
-exports.getByEmail = (requestBody, callback) => {
+exports.getUserByEmail = (requestBody, callback) => {
     db.query(`SELECT * FROM customer WHERE email="${requestBody.email}"`, (error, result) => {
 
         if (error) {

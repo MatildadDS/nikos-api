@@ -9,16 +9,16 @@ exports.home = (request, response) => {
 
 exports.signup = (request, response) => {
     user.getUserByEmail(request.body, (error, result) => {
-        const {first_name} = request.body;
+        const {first_name, last_name, gender, phone, email, password} = request.body;
         if (error) {
         response.send(error.message);
         } else if (result.length > 0) {
             response.status(409).json({message: "A user with the same ID already exists" })                     
             } else {
-                if (typeof first_name !== "string") {
-                response.status(400).json({message: "The firstname field must be a string"})            
-                } else if ( !first_name ) {
-                    response.status(400).json({message: "The firstname field is not filled in"})
+                // if (typeof first_name !== "string" || typeof last_name !== "string" || gender !=="string" || phone !== "number" || email !== "email" || password !== "password" ) {
+                // response.status(400).json({message: "The firstname field must be a string"}) }            
+                 if ( !first_name || !last_name || !gender || !phone || !email || !password ) {
+                    response.status(400).json({message: "A mandatory field is not filled in"})
                 } else {
                 const saltRounds = 10;
                 bcrypt.hash(request.body.password, saltRounds, (error, encryptedPassword) => {
