@@ -12,9 +12,9 @@ exports.getUserByEmail = (requestBody, callback) => {
 }
 
 exports.userRegister = (requestBody, encryptedPassword, callback) => {
-    let query = `INSERT INTO customer (firstname, lastname, gender, phone, email, password)
-    values( "${requestBody.firstname}", "${requestBody.lastname}", "${requestBody.gender}", "${requestBody.phone}", "${requestBody.email}", "${encryptedPassword}");`        
-    database.query(query, (error, result) => {
+    let query = `INSERT INTO customer (firstname, lastname, phone, email, password, city, country)
+    values( "${requestBody.firstname}", "${requestBody.lastname}", "${requestBody.phone}", "${requestBody.email}", "${encryptedPassword}", "${requestBody.city}", "${requestBody.country}");`        
+    db.query(query, (error, result) => {
         
         if (error){
             callback(error, null);

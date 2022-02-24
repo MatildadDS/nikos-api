@@ -1,25 +1,26 @@
 // OUTILS
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/controller");
+const userController = require("../controllers/userController");
 const projectController = require("../controllers/project.controller");
 const isAuth = require("../middlewares/isAuth");
 
 //GET
-router.get("/", controller.home);
-router.get('/', projectController.getProjects);
-router.get("/project/:id_project", isAuth, projectController.projectDetails);
+router.get("/", userController.home);
+router.get('/projects', isAuth, projectController.getProjects);
+router.get("/projects/:id_project", isAuth, projectController.projectDetails);
 
 //POST
-router.post("/signin", controller.login);
-router.post("/signup", controller.signup);
-router.post("/project", isAuth, projectController.createOne);
+router.post("/login", userController.login);
+router.post("/signup", userController.signup);
+router.post("/projects", isAuth,  projectController.createProject);
 
-// PATCH
-router.patch("/project/:id_project", isAuth, projectController.updateProject);
+// PUT
+router.put("/projects/:id_project", isAuth, projectController.updateProject);
 
 // DELETE
-router.delete('/project/:id_project', isAuth, projectController.deleteProject);
+router.delete('/projects/:id_project', isAuth, projectController.deleteProject);
+router.delete('/projects', isAuth, projectController.deleteAllProjects);
 
 // Erreur 404
 router.use("*", (request, response) => {

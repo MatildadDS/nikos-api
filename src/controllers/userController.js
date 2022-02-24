@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const secret = process.env.SECRET;
-const user = require("../models/model");
+const user = require("../models/userModel");
 
 exports.home = (request, response) => {   
     response.send ("hello world");
@@ -9,15 +9,15 @@ exports.home = (request, response) => {
 
 exports.signup = (request, response) => {
     user.getUserByEmail(request.body, (error, result) => {
-        const {first_name, last_name, gender, phone, email, password} = request.body;
+        const {firstname, lastname, phone, email, password, city, country} = request.body;
         if (error) {
         response.send(error.message);
         } else if (result.length > 0) {
             response.status(409).json({message: "A user with the same ID already exists" })                     
             } else {
-                // if (typeof first_name !== "string" || typeof last_name !== "string" || gender !=="string" || phone !== "number" || email !== "email" || password !== "password" ) {
+                // if (typeof first_name !== "string" || typeof last_name !== "string" || phone !== "number" || email !== "email" || password !== "password" ) {
                 // response.status(400).json({message: "The firstname field must be a string"}) }            
-                 if ( !first_name || !last_name || !gender || !phone || !email || !password ) {
+                 if ( !firstname || !lastname || !phone || !email || !password || !city || !country ) {
                     response.status(400).json({message: "A mandatory field is not filled in"})
                 } else {
                 const saltRounds = 10;
@@ -38,37 +38,38 @@ exports.signup = (request, response) => {
     })
 }
 
-exports.login = async (request, response) => {  
+exports.login = (request, response) => { 
     const email = request.body.email;
     const password = request.body.password;
     if (!email || !password ){
-        await response.send ("Please enter all fields")
+        response.send ("Please enter all fields")
     }
     else {
-        user.getUserByEmail(request.body, async (error, result) => {
+        user.getUserByEmail(request.body, (error, result) => {
             if (error) {
                 response.send(error.message);
             }
             else if (result.length === 0) {
-                await response.status(401).json({ error: 'User not found' });
+                response.status(404).json({ error: 'User not found' });
             }
             else {
                 const hash = result[0].password;
-                bcrypt.compare(password, hash, async (error, correct) => {
+                bcrypt.compare(password, hash, (error, correct) => {
                     if (error) {
                         response.send(error.message);
                     }
                     else if (!correct) {
-                        await response.status(401).json({ error: 'Wrong password' });
+                        response.status(400).json({ error: 'Wrong password' });
                     }
                     else {
                         const user = {
                             id_customer: result[0].id_customer,
-                            first_name: result[0].first_name,
-                            last_name: result[0].last_name,
-                            gender: result[0].gender,
+                            firstname: result[0].firstname,
+                            lastname: result[0].lastname,
                             phone: result[0].phone,
                             email: result[0].email,
+                            city: result[0].city,
+                            country: result[0].country,
                         }
                         jwt.sign(user, secret, {expiresIn: "24h"}, (error, token) => {
                             if (error) {
@@ -77,22 +78,24 @@ exports.login = async (request, response) => {
                             else {
                                 request.user = {
                                     id_customer: result[0].id_customer,
-                                    first_name: result[0].first_name,
-                                    last_name: result[0].last_name,
-                                    gender: result[0].gender,
+                                    firstname: result[0].firstname,
+                                    lastname: result[0].lastname,
                                     phone: result[0].phone,
                                     email: result[0].email,
+                                    city: result[0].city,
+                                    country: result[0].country,
                                 };
                                 console.log(token)
                                 response.status(200).json(
                                     { token: token, 
                                         user: {
                                             id_customer: user.id_customer,
-                                            first_name : user.first_name,
-                                            last_name : user.last_name,
-                                            gender: user.gender,
+                                            firstname : user.firstname,
+                                            lastname : user.lastname,
                                             phone: user.phone,
                                             email: user.email,
+                                            city : user.city,
+                                            country : user.country,
                                         } 
                                     }
                                 );    

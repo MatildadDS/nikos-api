@@ -1,41 +1,21 @@
-const { result } = require("lodash");
 const project = require("../models/project.model") 
-const { projectValidation } = require('../validators')
 
-exports.createOne = (request, response) => {
-    const errors = projectValidation(request.body)
-        if (errors.length > 0 ) {
-            response.status(400).json({errors})
-        }
-        else {
-            const project = {...request.body, customer_id : request.user.customer_id, creation_date: Date.now()}
-            project.addOne (project, (error, result) => {
+exports.createProject = (request, response) => {
+
+            const projectUser = {...request.body, customer_id : request.user.id_customer}
+            project.addOne (projectUser, (error, result) => {
                 if (error) {
                     response.send (error.message);
                 }
                 else {
-                    if (tattoo_picture) {
-                        project.addTattooPicture(request.body, result[0].id_project, (error, result) => {
-                            if (error) {
-                                response.send (error.message);
-                            }
-                        })
-                    }
-                    if (description_img) {
-                        project.addDescriptionImg(request.body, result[0].id_project, (error, result) => {
-                            if (error) {
-                                response.send (error.message);
-                            }
-                        })
-                    }
                     response.status(201).json({message: "Project completed successfully!"})
                 }  
             })
-        }
-    }
+}
 
 exports.getProjects = (request,response) => {
-    user.getAllProjects ((error, projects) =>{
+    const {id_customer} = request.user
+    project.getAllProjects (id_customer, (error, projects) =>{
         if (error) {
             response.send(error.message);
         }
@@ -61,7 +41,7 @@ exports.updateProject = (request, response) => {
     const {id_project} = request.params;
     const {id_customer} = request.body
     project.getDetails (id_project, (error, project_info) => {
-    if (id_customer !== projet_info.customer_id) {
+    if (id_customer !== project_info.customer_id) {
         response.status(403).json({message: "You are not authorized to access this resource"})
     }
     else {
@@ -79,28 +59,36 @@ exports.updateProject = (request, response) => {
 
 exports.deleteProject = (request, response) => {
     const {id_project} = request.params;
-    const {username} = request.username;    
-    if (!username) {
+    const {id_customer} = request.user;    
+    if (!id_customer) {
         response.status(401).json({message: "User not connected"})
     }
-    // else if (role === "guest") {
-    //     response.status(403).json({message: "Vous n'êtes pas autorisé à accéder à cette ressource"})
-    // }
     else {
-        project.deleteBooking (id_project,  (error, result)=>{
+        project.deleteProject (id_project,  (error, result)=>{
             if (error) {
                 response.send (error.message);
             }
             else {
-                project.delete(id_project, (error, result) => {
-                    if (error) {
-                    response.send (error.message);
-                    }
-                    else {
-                    response.status(200).json({message: "project deleted", result});
-                    }
-                })
+                response.status(200).json({message: "project deleted", result});
             }
-        })       
+        })
+    }
+} 
+
+exports.deleteAllProjects = (request, response) => {
+    const {id_customer} = request.user;    
+    if (!id_customer) {
+        response.status(401).json({message: "User not connected"})
+    }
+    else {
+        project.deleteAllProjects (id_customer,  (error, result)=>{
+            if (error) {
+                response.send (error.message);
+            }
+            else {
+                response.status(200).json({message: "All projects are removed successfully", result});
+            }
+        })
     }
 }
+    
